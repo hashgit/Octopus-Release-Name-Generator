@@ -1,0 +1,11 @@
+echo $Env:bamboo_planRepository_branchName
+$sanitized = $Env:bamboo_planRepository_branchName.Replace(' ', '-').Replace('/', '-').Replace('_', '-')
+echo $sanitized
+$sanitized = $sanitized.substring(0, [System.Math]::Min(20, $sanitized.Length))
+if ($sanitized.Contains("feature-")) {
+    $sanitized = $sanitized.Replace("feature-", "") + (-join ((65..90) + (97..122) | Get-Random -Count 8 | % {[char]$_}))
+}
+echo $sanitized
+echo "branchName=$sanitized" | Out-File -FilePath custom_variables.properties -Encoding ascii
+echo "version=$Env:bamboo_VMajor.$Env:bamboo_VMinor.$Env:bamboo_buildNumber" | Out-File -FilePath custom_variables.properties -Encoding ascii
+echo "versionbranch=$Env:bamboo_VMajor.$Env:bamboo_VMinor.$Env:bamboo_buildNumber-$sanitized" | Out-File -FilePath custom_variables.properties -Encoding ascii
